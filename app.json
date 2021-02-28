@@ -1,0 +1,12 @@
+{
+  "name": "checkin",
+  "displayName": "checkin",
+  "expo": {
+    "name": "checkin",
+    "slug": "checkin",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
