@@ -1,4 +1,4 @@
-package com.checkin;
+package com.ismaelsky1.checkin;
 
 import android.os.Bundle;
 
