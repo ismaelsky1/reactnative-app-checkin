@@ -14,7 +14,7 @@ import FeedBackScanQrCode from "./FeedBackScanQrCode";
 export default function Routes() {
    return (
       <NavigationContainer>
-         <Stack.Navigator screenOptions={{headerShown:false}}>
+         <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="ListEvents" component={ListEvents} />
             <Stack.Screen name="ShowEvent" component={ShowEvent} />
             <Stack.Screen name="ScanQrCode" component={ScanQrCode} />

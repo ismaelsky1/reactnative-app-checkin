@@ -3,27 +3,37 @@ import React, { Component, useCallback, useEffect, useState } from 'react';
 import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import { Create, FindAll } from "../data/storagen";
+import { Feather } from '@expo/vector-icons';
 
-export default function ListEvents() {
+export default function ListEvents(props: any) {
 
-  const { navigate, goBack } = useNavigation();
+  const { navigate, goBack, canGoBack } = useNavigation();
   const [isNewEvent, setIsNewEvent] = useState<boolean>(false);
   const [nameNewEvent, setNameNewEvent] = useState<string>();
 
   const [listEvents, setListEvents] = useState<any[]>();
 
   useEffect(() => {
-    ListEvets();
-  }, [])
+    indexEvents();
+  }, [props])
 
-  async function ListEvets() {
+  useEffect(() => {
+    const unsubscribe = props.navigation.addListener('focus', () => {
+      indexEvents();
+    });
+
+    return unsubscribe;
+  }, [props.navigation]);
+
+  async function indexEvents() {
     const list = await FindAll('@events');
+    console.log(list)
     setListEvents(list);
   }
 
   async function newEventCreate() {
     await Create('@events', nameNewEvent);
-    ListEvets();
+    indexEvents();
     setIsNewEvent(false);
   }
 
@@ -40,7 +50,7 @@ export default function ListEvents() {
               <Text style={styles.headerItemClose}>X</Text>
             </TouchableOpacity>
           </View>
-          <TextInput onChangeText={(name) => { const n = name.toUpperCase(); console.log(n); setNameNewEvent(n) }} placeholder="Nome" style={styles.textInput} />
+          <TextInput onChangeText={(name) => { const n = name.toUpperCase(); setNameNewEvent(n) }} placeholder="Nome" style={styles.textInput} />
           <TouchableOpacity onPress={() => { newEventCreate() }} style={styles.button}><Text style={styles.labelButton}>Salvar</Text></TouchableOpacity>
         </>
       )}
@@ -50,7 +60,9 @@ export default function ListEvents() {
           <TouchableOpacity onPress={() => { navigate('ShowEvent', item) }}>
             <View style={styles.item}>
               <Text style={styles.TextItem}>{item.name}</Text>
+              <Feather name="chevron-right" size={24} color="black" />
             </View>
+
           </TouchableOpacity>
         )}
       />

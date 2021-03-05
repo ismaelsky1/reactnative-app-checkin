@@ -12,16 +12,17 @@ import QRCode from 'react-native-qrcode-svg';
 
 
 export default function App(props: any) {
-  const { navigate, goBack } = useNavigation();
+  const { navigate, goBack, canGoBack } = useNavigation();
   const [isNewGuest, setIsNewGuest] = useState(false);
   const [nameNewGuest, setNameNewGuest] = useState<any>();
-  const [currentEvent, setCurrentEvent] = useState<{ id: string | undefined, name: string | undefined }>();
+  const [currentEvent, setCurrentEvent] = useState<{ id: string | undefined , name: string | undefined }>();
   const [qrRef, setQrRef] = useState<any>();
   const [loadQrShare, setLoadQrShare] = useState<boolean>(false);
 
   const [lisGuest, setLisGuest] = useState<{ id: string, name: string, event: string | null, presence: boolean }[] | []>([]);
 
   const [isSheet, setIsSheet] = useState({ isVisible: false, current: '' })
+  const [isSheetConfig, setIsSheetConfig] = useState({ isVisible: false })
 
   useEffect(() => {
     setCurrentEvent(props.route.params);
@@ -47,7 +48,10 @@ export default function App(props: any) {
     setIsSheet({ isVisible: false, current: '' });
   }
 
-
+  async function deleteEvent() {
+    await Delete('@events', ''+currentEvent?.id);
+    goBack(); 
+  }
 
   function saveQrToDisk() {
 
@@ -82,8 +86,8 @@ export default function App(props: any) {
 
   }
 
-  function scan(){
-    navigate('ScanQrCode',currentEvent);
+  function scan() {
+    navigate('ScanQrCode', currentEvent);
   }
 
   return (
@@ -95,8 +99,8 @@ export default function App(props: any) {
 
         <Text style={styles.title}>{currentEvent?.name}</Text>
 
-        <TouchableOpacity onPress={() => { goBack() }}>
-          <Ionicons name="menu" size={24} color="black" />
+        <TouchableOpacity onPress={() => { setIsSheetConfig({ isVisible: true }) }}>
+          <Feather name="settings" size={24} color="black" />
         </TouchableOpacity>
       </View>
 
@@ -182,7 +186,44 @@ export default function App(props: any) {
             </View>
           </Modal>
         </Pressable>}
-      <TouchableOpacity onPress={()=>{scan()}} style={styles.button}><Text style={styles.labelButton}>Conferir Convite</Text></TouchableOpacity>
+
+      {isSheetConfig.isVisible &&
+        <Pressable onPress={() => setIsSheetConfig({ isVisible: !isSheetConfig.isVisible })} style={styles.modalBlockPress}>
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={isSheetConfig.isVisible}
+          >
+            <View style={styles.modal}>
+              <FlatList
+                style={styles.listSheet}
+                data={[
+                  { name: 'Deletar', icon: <Ionicons name="remove-circle-outline" size={24} color="black" />, onPress: (() => { deleteEvent() }) },
+                  // { name: 'Enviar Convite', icon: <Ionicons name="ios-share-outline" size={24} color="black" />, onPress: (() => { saveQrToDisk() }) },
+                ]}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    key={item.name}
+                    onPress={item.onPress}>
+                    <View style={styles.item}>
+                      <View style={styles.TextItemPrimary}>
+                        <Text style={styles.TextItem}>{item.name}</Text>
+                      </View>
+                      {item.icon}
+                    </View>
+                  </TouchableOpacity>
+                )}
+              />
+              <Pressable
+                style={[styles.buttonSheet]}
+                onPress={() => setIsSheet({ isVisible: !isSheetConfig.isVisible, current: '' })}
+              >
+                <Text style={styles.labelButtonSheet}>Cancelar</Text>
+              </Pressable>
+            </View>
+          </Modal>
+        </Pressable>}
+      <TouchableOpacity onPress={() => { scan() }} style={styles.button}><Text style={styles.labelButton}>Conferir Convite</Text></TouchableOpacity>
     </View>
   );
 }
