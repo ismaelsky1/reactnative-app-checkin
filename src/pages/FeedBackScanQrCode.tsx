@@ -17,7 +17,7 @@ export default function App(props: any) {
     if (props.route.params.status == 1) {
       setFeedBack({ text: `Bem-vindo ${props.route.params.curretGuest?.name}.`, color: '#006c8d' })
     } else if (props.route.params.status == 2) {
-      setFeedBack({ text: `Ops... ${props.route.params.curretGuest?.name} já esta presente. .`, color: '#8d0000' })
+      setFeedBack({ text: `Ops... ${props.route.params.curretGuest?.name} já esta presente.`, color: '#8d0000' })
 
     } else if (props.route.params.status == 3) {
       setFeedBack({ text: `Ops... Esse convite não é válido.`, color: '#8d0000' })

@@ -1,6 +1,6 @@
 // import { StatusBar } from 'expo-status-bar';
 import React, { Component, useEffect, useState } from 'react';
-import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View, Modal, Alert, Pressable } from 'react-native';
+import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View, Modal, Alert, Pressable, ActivityIndicator } from 'react-native';
 import { Ionicons, Feather } from '@expo/vector-icons';
 import { useNavigation } from "@react-navigation/native";
 import { Create, FindAll, Delete } from "../data/storagen";
@@ -10,12 +10,11 @@ import * as FileSystem from 'expo-file-system';
 
 import QRCode from 'react-native-qrcode-svg';
 
-
 export default function App(props: any) {
   const { navigate, goBack, canGoBack } = useNavigation();
   const [isNewGuest, setIsNewGuest] = useState(false);
   const [nameNewGuest, setNameNewGuest] = useState<any>();
-  const [currentEvent, setCurrentEvent] = useState<{ id: string | undefined , name: string | undefined }>();
+  const [currentEvent, setCurrentEvent] = useState<{ id: string | undefined, name: string | undefined }>();
   const [qrRef, setQrRef] = useState<any>();
   const [loadQrShare, setLoadQrShare] = useState<boolean>(false);
 
@@ -49,18 +48,17 @@ export default function App(props: any) {
   }
 
   async function deleteEvent() {
-    await Delete('@events', ''+currentEvent?.id);
-    goBack(); 
+    await Delete('@events', '' + currentEvent?.id);
+    goBack();
   }
 
   function saveQrToDisk() {
 
-    let baseQr = '';
+    setLoadQrShare(true);
 
     qrRef.toDataURL((data: any) => {
       async function sha() {
-        console.log(data)
-        const image_source = 'https://images.unsplash.com/photo-1508138221679-760a23a2285b?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80';
+        const image_source = 'https://smartpsi.com.br/assets/img/logo.png';
         FileSystem.downloadAsync(
           image_source,
           FileSystem.documentDirectory + '.png'
@@ -72,11 +70,13 @@ export default function App(props: any) {
               { 'encoding': FileSystem.EncodingType.Base64 }
             )
               .then(() => {
+                setLoadQrShare(false);
                 Sharing.shareAsync(uri);
               })
 
           })
           .catch(error => {
+            setLoadQrShare(false);
             console.error(error);
           });
       }
@@ -93,7 +93,7 @@ export default function App(props: any) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Pressable onPress={() => { goBack() }}>
+        <Pressable style={styles.headerGoBack} onPress={() => { goBack() }}>
           <Ionicons name="chevron-back" size={24} color="black" />
         </Pressable>
 
@@ -150,40 +150,49 @@ export default function App(props: any) {
             transparent={true}
             visible={isSheet.isVisible}
           >
-            <View style={styles.modal}>
-              <View style={styles.QrCodeModal}>
-                <QRCode
-                  backgroundColor='#ebebeb'
-                  value={isSheet.current}
-                  getRef={(e) => { setQrRef(e) }}
-                />
-              </View>
-              <FlatList
-                style={styles.listSheet}
-                data={[
-                  { name: 'Deletar', icon: <Ionicons name="remove-circle-outline" size={24} color="black" />, onPress: (() => { deleteGuest(isSheet.current) }) },
-                  { name: 'Enviar Convite', icon: <Ionicons name="ios-share-outline" size={24} color="black" />, onPress: (() => { saveQrToDisk() }) },
-                ]}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    key={item.name}
-                    onPress={item.onPress}>
-                    <View style={styles.item}>
-                      <View style={styles.TextItemPrimary}>
-                        <Text style={styles.TextItem}>{item.name}</Text>
-                      </View>
-                      {item.icon}
-                    </View>
-                  </TouchableOpacity>
-                )}
-              />
-              <Pressable
-                style={[styles.buttonSheet]}
-                onPress={() => setIsSheet({ isVisible: !isSheet.isVisible, current: '' })}
-              >
-                <Text style={styles.labelButtonSheet}>Cancelar</Text>
-              </Pressable>
+            <View key='modalSheetGuest' style={styles.modal}>
+              {loadQrShare &&
+            <View style={styles.activeLoad}>
+               <ActivityIndicator size="large" color="#006c8d" />
+            </View>}
+              {!loadQrShare &&
+                <>
+                  <View style={styles.QrCodeModal}>
+                    <QRCode
+                      backgroundColor='#ebebeb'
+                      value={isSheet.current}
+                      getRef={(e) => { setQrRef(e) }}
+                    />
+                  </View>
+                  <FlatList
+                    style={styles.listSheet}
+                    data={[
+                      { name: 'Deletar', icon: <Ionicons name="remove-circle-outline" size={24} color="black" />, onPress: (() => { deleteGuest(isSheet.current) }) },
+                      { name: 'Enviar Convite', icon: <Ionicons name="ios-share-outline" size={24} color="black" />, onPress: (() => { saveQrToDisk() }) },
+                    ]}
+                    renderItem={({ item }) => (
+                      <TouchableOpacity
+                        key={item.name}
+                        onPress={item.onPress}>
+                        <View style={styles.item}>
+                          <View style={styles.TextItemPrimary}>
+                            <Text style={styles.TextItem}>{item.name}</Text>
+                          </View>
+                          {item.icon}
+                        </View>
+                      </TouchableOpacity>
+                    )}
+                  />
+                  <Pressable
+                    style={[styles.buttonSheet]}
+                    onPress={() => setIsSheet({ isVisible: !isSheet.isVisible, current: '' })}
+                  >
+                    <Text style={styles.labelButtonSheet}>Cancelar</Text>
+                  </Pressable>
+                </>
+              }
             </View>
+
           </Modal>
         </Pressable>}
 
@@ -243,6 +252,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 10,
     marginBottom: 8
+  },
+  headerGoBack: {
+    padding: 5
   },
   title: {
     fontSize: 16,
@@ -323,6 +335,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     width: '100%',
+    borderTopLeftRadius: 14,
+    borderTopRightRadius: 14
   },
   modalBlockPress: {
     position: 'absolute',
@@ -331,6 +345,11 @@ const styles = StyleSheet.create({
     height: '100%',
     marginLeft: -15,
     marginTop: -20
+  },
+  activeLoad: {
+    flex: 1,
+    flexDirection:'row',
+    justifyContent: 'center'
   },
   QrCodeModal: {
     alignItems: 'center',
