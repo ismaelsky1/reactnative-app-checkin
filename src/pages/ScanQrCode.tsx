@@ -3,6 +3,7 @@ import { Text, View, StyleSheet, Button, Pressable, TouchableOpacity } from 'rea
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from '@expo/vector-icons';
+import Constants from 'expo-constants';
 
 import { FindOnById, Update } from "../data/storagen";
 
@@ -74,6 +75,7 @@ export default function App(props: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginTop: Constants.statusBarHeight
   },
   header: {
     width: '100%',
