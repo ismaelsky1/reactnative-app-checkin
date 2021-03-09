@@ -8,8 +8,18 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgorundColor": "#ffffff"
+    },
     "android": {
-      "package": "com.ismaelsky1.checkin"
+      "package": "com.ismaelsky1.checkin",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "background": "#FFF"
+      }
     }
   }
 }
