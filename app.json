@@ -1,9 +1,9 @@
 {
-  "name": "checkin",
-  "displayName": "checkin",
+  "name": "check-in",
+  "displayName": "Convit Digital",
   "expo": {
     "name": "checkin",
-    "slug": "checkin",
+    "slug": "ConvitDigital",
     "version": "1.0.0",
     "assetBundlePatterns": [
       "**/*"
