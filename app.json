@@ -18,7 +18,7 @@
       "package": "com.ismaelsky1.checkin",
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
-        "background": "#FFF"
+        "backgroundColor": "#FFF"
       }
     }
   }
